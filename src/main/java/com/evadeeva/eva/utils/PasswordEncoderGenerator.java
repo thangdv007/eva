@@ -12,7 +12,7 @@ public class PasswordEncoderGenerator {
         System.out.println(passwordEncoder.encode("123456"));
 
         Date date = new Date();
-        System.out.println(date);;
+        System.out.println(date);
     }
 }
 

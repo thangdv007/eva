@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -17,18 +18,17 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
-    private  JwtTokenProvider tokenProvider;
+    private JwtConfig jwtConfig;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
-        this.tokenProvider = tokenProvider;
+    public JwtAuthenticationFilter(JwtConfig jwtConfig, CustomUserDetailsService customUserDetailsService) {
+        this.jwtConfig = jwtConfig;
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    public JwtAuthenticationFilter() {
-    }
+    public JwtAuthenticationFilter() {}
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -36,9 +36,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = this.getJWTFromRequest(request);
 
         // validate token
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)){
+        if (StringUtils.hasText(token) && jwtConfig.validateToken(token)){
             // get username from token
-            String username = tokenProvider.getUsernameFromJWT(token);
+            String username = jwtConfig.getUsernameFromJWT(token);
 
             // load user associated with token
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
