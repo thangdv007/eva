@@ -113,9 +113,8 @@ public class UserServiceImpl implements UserService {
                 //cập nhật pass mới
                 user.setPassword(passwordEncoder().encode(passwordRequest.getPassword()));
 
-                UserResponse userResponse = userMapper.mapModelToResponse(userRepository.save(user));
                 //lưu và trả về kết quả
-                return userResponse;
+                return userMapper.mapModelToResponse(userRepository.save(user));
             }else {
                 return null;
             }

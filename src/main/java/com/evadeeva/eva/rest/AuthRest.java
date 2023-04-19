@@ -22,19 +22,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthRest {
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    private JwtConfig jwtConfig;
+    private final JwtConfig jwtConfig;
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     public AuthRest(AuthenticationManager authenticationManager, JwtConfig jwtConfig, UserRepository userRepository, UserMapper userMapper, UserService userService) {
         this.authenticationManager = authenticationManager;
