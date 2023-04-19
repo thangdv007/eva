@@ -1,6 +1,10 @@
 package com.evadeeva.eva.models.response;
 
+import com.evadeeva.eva.mapper.RoleMapper;
+import com.evadeeva.eva.models.Role;
 import lombok.Data;
+
+import java.util.Set;
 
 @Data
 public class UserResponse {
@@ -16,4 +20,6 @@ public class UserResponse {
     private String phone;
 
     private String image;
+
+    private Set<RoleResponse> roleResponses;
 }
