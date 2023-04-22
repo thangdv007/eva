@@ -11,28 +11,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-@Table(name = "banner")
-public class Banner {
+@Table(name = "policy_image")
+public class PolicyImage {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "banner_id")
+	@Column(name = "policy_image_id")
 	private long id;
 	
-	@Column(nullable = false)
-	private String name;
-	
 	@Column
-	private String image;
+	private String img;
 	
 	@Column
 	private Date createdDate;
@@ -40,11 +34,11 @@ public class Banner {
 	@Column
 	private Date modifiedDate;
 	
-	@Column(nullable = false)
+	@Column
 	private int status;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id", nullable = false)
-	private Category category;
-	
+	@JoinColumn(name = "policy_id", nullable = false)
+	private Policy policy;
+
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.evadeeva.eva.models.Banner;
-import com.evadeeva.eva.models.Category;
 
 public interface BannerRepository extends JpaRepository<Banner, Long> {
 	List<Banner> findByCategoryId(long categoryId);

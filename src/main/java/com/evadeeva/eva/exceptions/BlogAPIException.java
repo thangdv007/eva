@@ -1,4 +1,4 @@
-package com.evadeeva.eva.exception;
+package com.evadeeva.eva.exceptions;
 
 import org.springframework.http.HttpStatus;
 

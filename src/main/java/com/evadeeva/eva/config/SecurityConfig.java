@@ -39,7 +39,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http.csrf().disable()
+        http
+        		.csrf().disable()
                     .exceptionHandling()
                     .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
@@ -54,6 +55,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+  
     protected void filterChain(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService((userDetailsService)).passwordEncoder((passwordEncoder()));
     }

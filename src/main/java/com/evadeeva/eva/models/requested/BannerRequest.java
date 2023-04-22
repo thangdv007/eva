@@ -1,4 +1,4 @@
-package com.evadeeva.eva.models.request;
+package com.evadeeva.eva.models.requested;
 
 import java.util.Date;
 

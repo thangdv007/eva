@@ -1,10 +1,8 @@
 package com.evadeeva.eva.models.response;
 
-import com.evadeeva.eva.mapper.RoleMapper;
-import com.evadeeva.eva.models.Role;
-import lombok.Data;
-
 import java.util.Set;
+
+import lombok.Data;
 
 @Data
 public class UserResponse {

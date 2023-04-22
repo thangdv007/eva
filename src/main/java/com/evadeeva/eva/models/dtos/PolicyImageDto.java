@@ -3,17 +3,14 @@ package com.evadeeva.eva.models.dtos;
 import java.util.Date;
 
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class BannerDto {
+public class PolicyImageDto {
 	private long id;
+
 	@NotEmpty
-	@Size(min =2, message = "Banner name should have at least 2 characters")
-	private String name;
-	 @NotEmpty
-	private String image;
+	private String img;
 	
 	private Date createdDate;
 	

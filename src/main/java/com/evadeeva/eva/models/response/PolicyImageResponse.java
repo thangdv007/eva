@@ -2,7 +2,7 @@ package com.evadeeva.eva.models.response;
 
 import java.util.List;
 
-import com.evadeeva.eva.models.dtos.BannerDto;
+import com.evadeeva.eva.models.dtos.PolicyImageDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BannerResponse {
+public class PolicyImageResponse {
 	
-	private List<BannerDto> content;
+	private List<PolicyImageDto> content;
 	
 	private int pageNo;
 	

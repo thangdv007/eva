@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.evadeeva.eva.models.dtos.CategoryDto;
 import com.evadeeva.eva.models.response.CategoryResponse;
-import com.evadeeva.eva.service.CategoryService;
+import com.evadeeva.eva.services.CategoryService;
 import com.evadeeva.eva.utils.AppConstants;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/category")
@@ -28,12 +31,14 @@ public class CategoryRest {
 	}
 
 	// create category
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/create")
-	public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
+	public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
 		return new ResponseEntity<>(categoryService.createCategory(categoryDto), HttpStatus.CREATED);
 	}
 
 	// get all category
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public CategoryResponse getAllCategories(
 			@RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
@@ -45,20 +50,23 @@ public class CategoryRest {
 	}
 
 	// get category by id
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/{id}")
 	public ResponseEntity<CategoryDto> getCategoryById(@PathVariable(name = "id") long id) {
 		return ResponseEntity.ok(categoryService.getCategoryById(id));
 	}
 
 	// update category
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
-	public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto,
+	public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CategoryDto categoryDto,
 			@PathVariable(name = "id") long id) {
 		CategoryDto categoryResponse = categoryService.updateCategory(categoryDto, id);
 		return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
 	}
 
 	// delete
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/delete/{id}")
 	public ResponseEntity<?> lockCategory(@PathVariable(name = "id") long id) {
 		categoryService.lockCategoryById(id);
@@ -66,12 +74,14 @@ public class CategoryRest {
 	}
 
 	// get all lock category
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/lock")
 	public List<CategoryDto> getLockCategories() {
 		return categoryService.getLockCategories();
 	}
 
 	// unlock
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/unlock/{id}")
 	public ResponseEntity<String> unlockCategory(@PathVariable(name = "id") long id) {
 		categoryService.unlockCategoryByStatusAndId(1, id);

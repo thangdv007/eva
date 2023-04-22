@@ -1,33 +1,35 @@
-package com.evadeeva.eva.service.impl;
+package com.evadeeva.eva.services.impl;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.evadeeva.eva.exception.BlogAPIException;
-import com.evadeeva.eva.exception.ResourceNotFoundException;
+import com.evadeeva.eva.exceptions.ResourceNotFoundException;
 import com.evadeeva.eva.models.Banner;
 import com.evadeeva.eva.models.Category;
 import com.evadeeva.eva.models.dtos.BannerDto;
 import com.evadeeva.eva.repositories.BannerRepository;
 import com.evadeeva.eva.repositories.CategoryRepository;
-import com.evadeeva.eva.service.BannerService;
+import com.evadeeva.eva.services.BannerService;
 
 @Service
 public class BannerServiceImpl implements BannerService {
 
 	@Autowired
-	private final BannerRepository bannerRepository;
+	private  BannerRepository bannerRepository;
+	@Autowired
+	private CategoryRepository categoryRepository;
+	@Autowired
+	private ModelMapper mapper;
 
-	private final CategoryRepository categoryRepository;
-
-	BannerServiceImpl(BannerRepository bannerRepository, CategoryRepository categoryRepository) {
+	BannerServiceImpl(BannerRepository bannerRepository, CategoryRepository categoryRepository, ModelMapper mapper) {
 		this.bannerRepository = bannerRepository;
 		this.categoryRepository = categoryRepository;
+		this.mapper = mapper;
 	}
 
 	// Create
@@ -47,8 +49,6 @@ public class BannerServiceImpl implements BannerService {
 		banner.setCreatedDate(currentDateTime);
 
 		Banner newBanner = bannerRepository.save(banner);
-		// chuyển Entity thành DTO
-		BannerDto bannerResponse = mapToDTO(newBanner);
 
 		return mapToDTO(newBanner);
 	}
@@ -64,6 +64,7 @@ public class BannerServiceImpl implements BannerService {
 		return banners.stream().map(banner -> mapToDTO(banner)).collect(Collectors.toList());
 	}
 
+	//delete
 	@Override
 	public void lockBannerById(long bannerId) {
 		// TODO Auto-generated method stub
@@ -106,28 +107,30 @@ public class BannerServiceImpl implements BannerService {
 
 	// chuyển Entity thành DTO
 	private BannerDto mapToDTO(Banner banner) {
-		BannerDto bannerDto = new BannerDto();
-
-		bannerDto.setId(banner.getId());
-		bannerDto.setName(banner.getName());
-		bannerDto.setImage(banner.getImage());
-		bannerDto.setCreatedDate(banner.getCreatedDate());
-		bannerDto.setModifiedDate(banner.getModifiedDate());
-		bannerDto.setStatus(banner.getStatus());
+		BannerDto bannerDto = mapper.map(banner, BannerDto.class);
+		
+//		BannerDto bannerDto = new BannerDto();
+//		bannerDto.setId(banner.getId());
+//		bannerDto.setName(banner.getName());
+//		bannerDto.setImage(banner.getImage());
+//		bannerDto.setCreatedDate(banner.getCreatedDate());
+//		bannerDto.setModifiedDate(banner.getModifiedDate());
+//		bannerDto.setStatus(banner.getStatus());
 
 		return bannerDto;
 	}
 
 	// chuyển DTO thành Entity
 	private Banner mapToEntity(BannerDto bannerDto) {
-		Banner banner = new Banner();
-
-		banner.setId(bannerDto.getId());
-		banner.setName(bannerDto.getName());
-		banner.setImage(bannerDto.getImage());
-		banner.setCreatedDate(banner.getCreatedDate());
-		banner.setModifiedDate(bannerDto.getModifiedDate());
-		banner.setStatus(bannerDto.getStatus());
+		Banner banner = mapper.map(bannerDto, Banner.class);
+		
+//		Banner banner = new Banner();
+//		banner.setId(bannerDto.getId());
+//		banner.setName(bannerDto.getName());
+//		banner.setImage(bannerDto.getImage());
+//		banner.setCreatedDate(banner.getCreatedDate());
+//		banner.setModifiedDate(bannerDto.getModifiedDate());
+//		banner.setStatus(bannerDto.getStatus());
 
 		return banner;
 	}

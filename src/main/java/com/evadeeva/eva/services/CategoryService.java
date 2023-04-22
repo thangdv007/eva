@@ -1,4 +1,4 @@
-package com.evadeeva.eva.service;
+package com.evadeeva.eva.services;
 
 import java.util.List;
 

@@ -5,8 +5,10 @@ import com.evadeeva.eva.models.requested.SignupRequest;
 import com.evadeeva.eva.models.requested.UserRequest;
 import com.evadeeva.eva.models.response.UserResponse;
 import org.mapstruct.*;
+import org.springframework.stereotype.Component;
 
 @Mapper
+@Component
 public interface UserMapper {
     User mapSignupToModel(SignupRequest signupRequest);
 

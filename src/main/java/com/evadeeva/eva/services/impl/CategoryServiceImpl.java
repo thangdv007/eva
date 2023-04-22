@@ -1,30 +1,32 @@
-package com.evadeeva.eva.service.impl;
+package com.evadeeva.eva.services.impl;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.evadeeva.eva.exception.ResourceNotFoundException;
+import com.evadeeva.eva.exceptions.ResourceNotFoundException;
 import com.evadeeva.eva.models.Category;
 import com.evadeeva.eva.models.dtos.CategoryDto;
 import com.evadeeva.eva.models.response.CategoryResponse;
 import com.evadeeva.eva.repositories.CategoryRepository;
-import com.evadeeva.eva.service.CategoryService;
+import com.evadeeva.eva.services.CategoryService;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
 	@Autowired
-	private final CategoryRepository categoryRepository;
+	private CategoryRepository categoryRepository;
+	private ModelMapper mapper;
 
-	CategoryServiceImpl(CategoryRepository categoryRepository) {
+	CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper mapper) {
 		this.categoryRepository = categoryRepository;
+        this.mapper = mapper;
 
 	}
 
@@ -33,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
 	public CategoryDto createCategory(CategoryDto categoryDto) {
 		// TODO Auto-generated method stub
 		// chuyển DTO thành Entity
-		Category category = maptoEntity(categoryDto);
+		Category category = mapToEntity(categoryDto);
 		category.setStatus(1);
 
 		Date currentDateTime = new Date();
@@ -101,8 +103,6 @@ public class CategoryServiceImpl implements CategoryService {
 
 		Category updatedCategory = categoryRepository.save(category);
 
-		CategoryDto categoryResponse = mapToDTO(updatedCategory);
-
 		return mapToDTO(updatedCategory);
 	}
 
@@ -154,25 +154,29 @@ public class CategoryServiceImpl implements CategoryService {
 
 	// chuyển Entity thành DTO
 	private CategoryDto mapToDTO(Category category) {
-		CategoryDto categoryDto = new CategoryDto();
-		categoryDto.setId(category.getId());
-		categoryDto.setTitle(category.getTitle());
-		categoryDto.setDescription(category.getDescription());
-		categoryDto.setCreatedDate(category.getCreatedDate());
-		categoryDto.setModifiedDate(category.getModifiedDate());
-		categoryDto.setStatus(category.getStatus());
+		CategoryDto categoryDto = mapper.map(category, CategoryDto.class);
+		
+//		CategoryDto categoryDto = new CategoryDto();
+//		categoryDto.setId(category.getId());
+//		categoryDto.setTitle(category.getTitle());
+//		categoryDto.setDescription(category.getDescription());
+//		categoryDto.setCreatedDate(category.getCreatedDate());
+//		categoryDto.setModifiedDate(category.getModifiedDate());
+//		categoryDto.setStatus(category.getStatus());
 		return categoryDto;
 	}
 
 	// chuyển DTO thành Entity
-	private Category maptoEntity(CategoryDto categoryDto) {
-		Category category = new Category();
-		category.setId(categoryDto.getId());
-		category.setTitle(categoryDto.getTitle());
-		category.setDescription(categoryDto.getDescription());
-		category.setCreatedDate(categoryDto.getCreatedDate());
-		category.setModifiedDate(categoryDto.getModifiedDate());
-		category.setStatus(categoryDto.getStatus());
+	private Category mapToEntity(CategoryDto categoryDto) {
+		Category category = mapper.map(categoryDto, Category.class);
+		
+//		Category category = new Category();
+//		category.setId(categoryDto.getId());
+//		category.setTitle(categoryDto.getTitle());
+//		category.setDescription(categoryDto.getDescription());
+//		category.setCreatedDate(categoryDto.getCreatedDate());
+//		category.setModifiedDate(categoryDto.getModifiedDate());
+//		category.setStatus(categoryDto.getStatus());
 		return category;
 	}
 
