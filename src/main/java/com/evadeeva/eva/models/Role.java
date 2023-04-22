@@ -24,3 +24,4 @@ public class Role {
     @ManyToMany(targetEntity =  User.class, mappedBy = "roles", fetch = FetchType.EAGER)
     private Set<User> users = new HashSet<>();
 }
+
