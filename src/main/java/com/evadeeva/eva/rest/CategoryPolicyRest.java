@@ -1,7 +1,5 @@
 package com.evadeeva.eva.rest;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,7 +20,7 @@ import com.evadeeva.eva.utils.AppConstants;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/categorypolicy")
+@RequestMapping("user/categorypolicy")
 public class CategoryPolicyRest {
 	private CategoryPolicyService categoryPolicyService;
 
@@ -32,26 +30,27 @@ public class CategoryPolicyRest {
 
 	// create category policy
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/create")
-	public ResponseEntity<CategoryPolicyDto> createCategoryPolicy(@Valid @RequestBody CategoryPolicyDto categoryPolicyDto) {
-		return new ResponseEntity<>(categoryPolicyService.createCategoryPolicy(categoryPolicyDto), HttpStatus.CREATED);
+	@PostMapping("/create/{id}")
+	public ResponseEntity<CategoryPolicyDto> createCategoryPolicy(@Valid @PathVariable(name = "id") long userId,
+			@RequestBody CategoryPolicyDto categoryPolicyDto) {
+		return new ResponseEntity<>(categoryPolicyService.createCategoryPolicy(userId, categoryPolicyDto), HttpStatus.CREATED);
 	}
 
 	// get all category policy
 	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping
-	public CategoryPolicyResponse getAllCategories(
+	@GetMapping("/{id}")
+	public CategoryPolicyResponse getAllCategories( @PathVariable(name = "id") long userId,
 			@RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
 			@RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
 			@RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
 			@RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DEREACTION, required = false) String sortDir
 		){
-		return categoryPolicyService.getAllCategoriesPolicy(pageNo, pageSize, sortBy, sortDir);
+		return categoryPolicyService.getAllCategoriesPolicyByUserId(userId, pageNo, pageSize, sortBy, sortDir);
 	}
 
 	// get category policy by id
 	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("/{id}")
+	@GetMapping("/categoryPolicyId/{id}")
 	public ResponseEntity<CategoryPolicyDto> getCategoryPolicyById(@PathVariable(name = "id") long id) {
 		return ResponseEntity.ok(categoryPolicyService.getCategoryPolicyById(id));
 	}
@@ -76,8 +75,12 @@ public class CategoryPolicyRest {
 	// get all lock category policy
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/lock")
-	public List<CategoryPolicyDto> getLockCategoriesPolicy() {
-		return categoryPolicyService.getLockCategoriesPolicy();
+	public CategoryPolicyResponse getLockCategoriesPolicy(
+			@RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+			@RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+			@RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+			@RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DEREACTION, required = false) String sortDir) {
+		return categoryPolicyService.getLockCategoriesPolicy(pageNo, pageSize, sortBy, sortDir);
 	}
 
 	// unlock

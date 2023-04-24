@@ -6,12 +6,16 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.evadeeva.eva.exceptions.ResourceNotFoundException;
 import com.evadeeva.eva.models.Banner;
 import com.evadeeva.eva.models.Category;
 import com.evadeeva.eva.models.dtos.BannerDto;
+import com.evadeeva.eva.models.response.BannerResponse;
 import com.evadeeva.eva.repositories.BannerRepository;
 import com.evadeeva.eva.repositories.CategoryRepository;
 import com.evadeeva.eva.services.BannerService;
@@ -20,7 +24,7 @@ import com.evadeeva.eva.services.BannerService;
 public class BannerServiceImpl implements BannerService {
 
 	@Autowired
-	private  BannerRepository bannerRepository;
+	private BannerRepository bannerRepository;
 	@Autowired
 	private CategoryRepository categoryRepository;
 	@Autowired
@@ -55,16 +59,34 @@ public class BannerServiceImpl implements BannerService {
 
 	// Lấy tất cả banner theo category id
 	@Override
-	public List<BannerDto> getBannerByCategoryId(long categoryId) {
-		// TODO Auto-generated method stub
-		// Lấy banners theo categoryId
-		List<Banner> banners = bannerRepository.findByCategoryId(categoryId);
+	public BannerResponse getBannerByCategoryId(long categoryId, int pageNo, int pageSize, String sortBy, String sortDir) {
+		
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+		// tạo trường hợp có thể phân trang
+		PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
+		// lấy banner theo categoryId
+		Page<Banner> banners = bannerRepository.findByCategoryId(categoryId, pageable);
 
-		// Chuyển đổi list banner entity thành list banner dto
-		return banners.stream().map(banner -> mapToDTO(banner)).collect(Collectors.toList());
+		// lấy nội dung cho đối tượng trang
+		List<Banner> listOfBanners = banners.getContent();
+
+		List<BannerDto> content = listOfBanners.stream().map(banner -> mapToDTO(banner))
+				.collect(Collectors.toList());
+		
+		BannerResponse bannerResponse = new BannerResponse();
+		
+		bannerResponse.setContent(content);
+		bannerResponse.setPageNo(banners.getNumber());
+		bannerResponse.setPageSize(banners.getSize());
+		bannerResponse.setTotalElements(banners.getTotalElements());
+		bannerResponse.setTotalPages(banners.getTotalPages());
+		bannerResponse.setLast(banners.isLast());
+		
+		return bannerResponse;
 	}
 
-	//delete
+	// delete
 	@Override
 	public void lockBannerById(long bannerId) {
 		// TODO Auto-generated method stub
@@ -83,10 +105,30 @@ public class BannerServiceImpl implements BannerService {
 
 	// lấy danh sách delete
 	@Override
-	public List<BannerDto> getLockBanners() {
-		// TODO Auto-generated method stub
-		List<Banner> banners = bannerRepository.findByStatus(0);
-		return banners.stream().map(banner -> mapToDTO(banner)).collect(Collectors.toList());
+	public BannerResponse getLockBanners(int pageNo, int pageSize, String sortBy, String sortDir) {
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+		// tạo trường hợp có thể phân trang
+		PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
+		// lấy banner theo categoryId
+		Page<Banner> banners = bannerRepository.findByStatus(0, pageable);
+
+		// lấy nội dung cho đối tượng trang
+		List<Banner> listOfBanners = banners.getContent();
+
+		List<BannerDto> content = listOfBanners.stream().map(banner -> mapToDTO(banner))
+				.collect(Collectors.toList());
+		
+		BannerResponse bannerResponse = new BannerResponse();
+		
+		bannerResponse.setContent(content);
+		bannerResponse.setPageNo(banners.getNumber());
+		bannerResponse.setPageSize(banners.getSize());
+		bannerResponse.setTotalElements(banners.getTotalElements());
+		bannerResponse.setTotalPages(banners.getTotalPages());
+		bannerResponse.setLast(banners.isLast());
+		
+		return bannerResponse;
 	}
 
 	// unlock banner
@@ -108,7 +150,7 @@ public class BannerServiceImpl implements BannerService {
 	// chuyển Entity thành DTO
 	private BannerDto mapToDTO(Banner banner) {
 		BannerDto bannerDto = mapper.map(banner, BannerDto.class);
-		
+
 //		BannerDto bannerDto = new BannerDto();
 //		bannerDto.setId(banner.getId());
 //		bannerDto.setName(banner.getName());
@@ -123,7 +165,7 @@ public class BannerServiceImpl implements BannerService {
 	// chuyển DTO thành Entity
 	private Banner mapToEntity(BannerDto bannerDto) {
 		Banner banner = mapper.map(bannerDto, Banner.class);
-		
+
 //		Banner banner = new Banner();
 //		banner.setId(bannerDto.getId());
 //		banner.setName(bannerDto.getName());

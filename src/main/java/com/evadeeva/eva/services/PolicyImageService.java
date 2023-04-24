@@ -1,19 +1,18 @@
 package com.evadeeva.eva.services;
 
-import java.util.List;
-
 import com.evadeeva.eva.models.dtos.PolicyImageDto;
+import com.evadeeva.eva.models.response.PolicyImageResponse;
 
 public interface PolicyImageService {
 	PolicyImageDto createPolicyImage(long policyId, PolicyImageDto policyImageDto);
 	
-	List<PolicyImageDto> getPolicyImageByPolicyId(long policyId);
+	PolicyImageResponse getPolicyImageByPolicyId(long policyId, int pageNo, int pageSize, String sortBy, String sortDir);
 
-	void lockPolicyImageById(long PolicyImageId);
+	void lockPolicyImageById(long id);
 	
-	List<PolicyImageDto> getLockPolicyImages();
+	PolicyImageResponse getLockPolicyImages(int pageNo, int pageSize, String sortBy, String sortDir);
 	
-	void unlockPolicyImageByStatusAndId(int status, long policyImageId);
+	void unlockPolicyImageByStatusAndId(int status, long id);
 
 	
 	

@@ -6,12 +6,16 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.evadeeva.eva.exceptions.ResourceNotFoundException;
 import com.evadeeva.eva.models.Policy;
 import com.evadeeva.eva.models.PolicyImage;
 import com.evadeeva.eva.models.dtos.PolicyImageDto;
+import com.evadeeva.eva.models.response.PolicyImageResponse;
 import com.evadeeva.eva.repositories.PolicyImageRepository;
 import com.evadeeva.eva.repositories.PolicyRepository;
 import com.evadeeva.eva.services.PolicyImageService;
@@ -55,22 +59,41 @@ public class PolicyImageServiceImpl implements PolicyImageService {
 
 	// Lấy tất cả PolicyImage theo Policy id
 	@Override
-	public List<PolicyImageDto> getPolicyImageByPolicyId(long policyId) {
-		// TODO Auto-generated method stub
-		// Lấy PolicyImages theo PolicyId
-		List<PolicyImage> policyImages = policyImageRepository.findByPolicyId(policyId);
+	public PolicyImageResponse getPolicyImageByPolicyId(long policyId, int pageNo, int pageSize, String sortBy,
+			String sortDir) {
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+		// tạo trường hợp có thể phân trang
+		PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
+		// tìm tất cả
+		
+		Page<PolicyImage> policyImages = policyImageRepository.findByPolicyId(policyId, pageable);
 
-		// Chuyển đổi list PolicyImage entity thành list PolicyImage dto
-		return policyImages.stream().map(policyImage -> mapToDTO(policyImage)).collect(Collectors.toList());
+		// lấy nội dung cho đối tượng trang
+		List<PolicyImage> listOfPolicyImages = policyImages.getContent();
+
+		List<PolicyImageDto> content = listOfPolicyImages.stream()
+				.map(policyImage -> mapToDTO(policyImage)).collect(Collectors.toList());
+
+		PolicyImageResponse policyImageResponse = new PolicyImageResponse();
+
+		policyImageResponse.setContent(content);
+		policyImageResponse.setPageNo(policyImages.getNumber());
+		policyImageResponse.setPageSize(policyImages.getSize());
+		policyImageResponse.setTotalElements(policyImages.getTotalElements());
+		policyImageResponse.setTotalPages(policyImages.getTotalPages());
+		policyImageResponse.setLast(policyImages.isLast());
+
+		return policyImageResponse;
 	}
 
 	//delete
 	@Override
-	public void lockPolicyImageById(long policyImageId) {
+	public void lockPolicyImageById(long id) {
 		// TODO Auto-generated method stub
 		// Tìm policyimg theo id
-		PolicyImage policyImage = policyImageRepository.findById(policyImageId)
-				.orElseThrow(() -> new ResourceNotFoundException("PolicyImage", "id", policyImageId));
+		PolicyImage policyImage = policyImageRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("PolicyImage", "id", id));
 		// thay đổi trạng thái
 		policyImage.setStatus(0);
 		// thời gian cập nhật
@@ -83,19 +106,41 @@ public class PolicyImageServiceImpl implements PolicyImageService {
 
 	// lấy danh sách delete
 	@Override
-	public List<PolicyImageDto> getLockPolicyImages() {
-		// TODO Auto-generated method stub
-		List<PolicyImage> policyImages = policyImageRepository.findByStatus(0);
-		return policyImages.stream().map(policyImage -> mapToDTO(policyImage)).collect(Collectors.toList());
+	public PolicyImageResponse getLockPolicyImages(int pageNo, int pageSize, String sortBy,
+			String sortDir) {
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+		// tạo trường hợp có thể phân trang
+		PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
+		// tìm tất cả
+		
+		Page<PolicyImage> policyImages = policyImageRepository.findByStatus(0, pageable);
+
+		// lấy nội dung cho đối tượng trang
+		List<PolicyImage> listOfPolicyImages = policyImages.getContent();
+
+		List<PolicyImageDto> content = listOfPolicyImages.stream()
+				.map(policyImage -> mapToDTO(policyImage)).collect(Collectors.toList());
+
+		PolicyImageResponse policyImageResponse = new PolicyImageResponse();
+
+		policyImageResponse.setContent(content);
+		policyImageResponse.setPageNo(policyImages.getNumber());
+		policyImageResponse.setPageSize(policyImages.getSize());
+		policyImageResponse.setTotalElements(policyImages.getTotalElements());
+		policyImageResponse.setTotalPages(policyImages.getTotalPages());
+		policyImageResponse.setLast(policyImages.isLast());
+
+		return policyImageResponse;
 	}
 
 	// unlock PolicyImage
 	@Override
-	public void unlockPolicyImageByStatusAndId(int status, long policyImageId) {
+	public void unlockPolicyImageByStatusAndId(int status, long id) {
 		// TODO Auto-generated method stub
 		// Tìm poicyimg theo id
-		PolicyImage policyImage = policyImageRepository.findById(policyImageId)
-				.orElseThrow(() -> new ResourceNotFoundException("PolicyImage", "id", policyImageId));
+		PolicyImage policyImage = policyImageRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("PolicyImage", "id", id));
 		// thay đổi trạng thái
 		policyImage.setStatus(1);
 		// thời gian cập nhật

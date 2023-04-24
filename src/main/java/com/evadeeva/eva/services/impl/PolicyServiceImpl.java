@@ -6,12 +6,16 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.evadeeva.eva.exceptions.ResourceNotFoundException;
 import com.evadeeva.eva.models.CategoryPolicy;
 import com.evadeeva.eva.models.Policy;
 import com.evadeeva.eva.models.dtos.PolicyDto;
+import com.evadeeva.eva.models.response.PolicyResponse;
 import com.evadeeva.eva.repositories.CategoryPolicyRepository;
 import com.evadeeva.eva.repositories.PolicyRepository;
 import com.evadeeva.eva.services.PolicyService;
@@ -56,37 +60,60 @@ public class PolicyServiceImpl implements PolicyService {
 
 	// Lấy tất cả policy theo category id
 	@Override
-	public List<PolicyDto> getPolicyByCategoryPolicyId(long categoryPolicyId) {
-		// TODO Auto-generated method stub
-		// Lấy policies theo categoryId
-		List<Policy> policies = policyRepository.findByCategoryPolicyId(categoryPolicyId);
+	public PolicyResponse getPolicyByCategoryPolicyId(long categoryPolicyId, int pageNo, int pageSize, String sortBy,
+			String sortDir) {
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+		// tạo trường hợp có thể phân trang
+		PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
+		// tìm tất cả
+		
+		Page<Policy> policies = policyRepository.findByCategoryPolicyId(categoryPolicyId, pageable);
 
-		// Chuyển đổi list policies entity thành list policy dto
-		return policies.stream().map(policy -> mapToDTO(policy)).collect(Collectors.toList());
+		// lấy nội dung cho đối tượng trang
+		List<Policy> listOfPolicy = policies.getContent();
+
+		List<PolicyDto> content = listOfPolicy.stream()
+				.map(policy -> mapToDTO(policy)).collect(Collectors.toList());
+
+		PolicyResponse policyResponse = new PolicyResponse();
+
+		policyResponse.setContent(content);
+		policyResponse.setPageNo(policies.getNumber());
+		policyResponse.setPageSize(policies.getSize());
+		policyResponse.setTotalElements(policies.getTotalElements());
+		policyResponse.setTotalPages(policies.getTotalPages());
+		policyResponse.setLast(policies.isLast());
+
+		return policyResponse;
 	}
 
-	//update
+	// update
 	@Override
 	public PolicyDto updatePolicy(PolicyDto policyDto, long id) {
 		// Lấy policy theo id
 		Policy policy = policyRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Policy", "id", id));
+		
+		policy.setName(policyDto.getName());
+		policy.setContent(policyDto.getContent());
+		
 		Date currentDateTime = new Date();
-		policy.setCreatedDate(currentDateTime);
-		
+		policy.setModifiedDate(currentDateTime);
+
 		Policy updatedPolicy = policyRepository.save(policy);
-		
+
 		return mapToDTO(updatedPolicy);
-		
+
 	}
 
 	// delete
 	@Override
-	public void lockPolicyById(long policyId) {
+	public void lockPolicyById(long id) {
 		// TODO Auto-generated method stub
 		// Tìm policy theo id
-		Policy policy = policyRepository.findById(policyId)
-				.orElseThrow(() -> new ResourceNotFoundException("Policy", "id", policyId));
+		Policy policy = policyRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Policy", "id", id));
 		// thay đổi trạng thái
 		policy.setStatus(0);
 		// thời gian cập nhật
@@ -99,19 +126,41 @@ public class PolicyServiceImpl implements PolicyService {
 
 	// lấy danh sách delete
 	@Override
-	public List<PolicyDto> getLockPolicies() {
-		// TODO Auto-generated method stub
-		List<Policy> policies = policyRepository.findByStatus(0);
-		return policies.stream().map(policy -> mapToDTO(policy)).collect(Collectors.toList());
+	public PolicyResponse getLockPolicies(int pageNo, int pageSize, String sortBy,
+			String sortDir) {
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+		// tạo trường hợp có thể phân trang
+		PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
+		// tìm tất cả
+		
+		Page<Policy> policies = policyRepository.findByStatus(0, pageable);
+
+		// lấy nội dung cho đối tượng trang
+		List<Policy> listOfPolicy = policies.getContent();
+
+		List<PolicyDto> content = listOfPolicy.stream()
+				.map(policy -> mapToDTO(policy)).collect(Collectors.toList());
+
+		PolicyResponse policyResponse = new PolicyResponse();
+
+		policyResponse.setContent(content);
+		policyResponse.setPageNo(policies.getNumber());
+		policyResponse.setPageSize(policies.getSize());
+		policyResponse.setTotalElements(policies.getTotalElements());
+		policyResponse.setTotalPages(policies.getTotalPages());
+		policyResponse.setLast(policies.isLast());
+
+		return policyResponse;
 	}
 
 	// unlock policy
 	@Override
-	public void unlockPolicyByStatusAndId(int status, long policyId) {
+	public void unlockPolicyByStatusAndId(int status, long id) {
 		// TODO Auto-generated method stub
 		// Tìm policy theo id
-		Policy policy = policyRepository.findById(policyId)
-				.orElseThrow(() -> new ResourceNotFoundException("Policy", "id", policyId));
+		Policy policy = policyRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Policy", "id", id));
 		// thay đổi trạng thái
 		policy.setStatus(1);
 		// thời gian cập nhật

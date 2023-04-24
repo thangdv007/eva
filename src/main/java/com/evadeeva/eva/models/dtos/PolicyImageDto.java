@@ -17,4 +17,6 @@ public class PolicyImageDto {
 	private Date modifiedDate;
 	
 	private int status;
+	
+	private long policyId;
 }

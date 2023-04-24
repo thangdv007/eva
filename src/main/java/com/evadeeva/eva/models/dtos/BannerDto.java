@@ -20,4 +20,6 @@ public class BannerDto {
 	private Date modifiedDate;
 	
 	private int status;
+	
+	private long categoryId;
 }

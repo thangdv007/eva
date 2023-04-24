@@ -1,14 +1,14 @@
 package com.evadeeva.eva.repositories;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.evadeeva.eva.models.Policy;
 
 
 public interface PolicyRepository extends JpaRepository<Policy, Long> {
-	List<Policy> findByCategoryPolicyId(long categoryPolicyId);
+	Page<Policy> findByCategoryPolicyId(long categoryPolicyId, PageRequest pageable);
 
-	List<Policy> findByStatus(int status);
+	Page<Policy> findByStatus(int status, PageRequest pageable);
 }

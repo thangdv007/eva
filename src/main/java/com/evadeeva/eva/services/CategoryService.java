@@ -1,16 +1,16 @@
 package com.evadeeva.eva.services;
 
-import java.util.List;
-
 import com.evadeeva.eva.models.dtos.CategoryDto;
 import com.evadeeva.eva.models.response.CategoryResponse;
 
 public interface CategoryService {
-	CategoryDto createCategory(CategoryDto categoryDto);
+	CategoryDto createCategory(long userId, CategoryDto categoryDto);
 	
-	CategoryResponse getAllCategories(int pageNo, int pageSize, String sortBy, String sortDir);
+	CategoryResponse getCategoryByUserId(long userId, int pageNo, int pageSize, String sortBy, String sortDir);
 	
-	List<CategoryDto> getLockCategories();
+//	CategoryResponse getAllCategories(int pageNo, int pageSize, String sortBy, String sortDir);
+	
+	CategoryResponse getLockCategories(int pageNo, int pageSize, String sortBy, String sortDir);
 	
 	CategoryDto getCategoryById(long id);
 	

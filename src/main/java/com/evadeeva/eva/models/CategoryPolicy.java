@@ -32,4 +32,8 @@ public class CategoryPolicy {
 
 	@OneToMany(mappedBy = "categoryPolicy", cascade = CascadeType.ALL)
 	private Set<Policy> policies = new HashSet<>();
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 }

@@ -44,4 +44,9 @@ public class Category {
 
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
 	private Set<Banner> banners = new HashSet<>();
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
+	
 }

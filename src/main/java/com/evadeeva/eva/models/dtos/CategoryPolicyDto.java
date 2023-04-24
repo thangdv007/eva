@@ -18,4 +18,6 @@ public class CategoryPolicyDto {
 	private Date modifiedDate;
 	
 	private int status;
+	
+	private long userId;
 }

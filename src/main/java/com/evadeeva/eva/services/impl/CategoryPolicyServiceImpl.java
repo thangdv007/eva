@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 
 import com.evadeeva.eva.exceptions.ResourceNotFoundException;
 import com.evadeeva.eva.models.CategoryPolicy;
+import com.evadeeva.eva.models.User;
 import com.evadeeva.eva.models.dtos.CategoryPolicyDto;
 import com.evadeeva.eva.models.response.CategoryPolicyResponse;
 import com.evadeeva.eva.repositories.CategoryPolicyRepository;
+import com.evadeeva.eva.repositories.UserRepository;
 import com.evadeeva.eva.services.CategoryPolicyService;
 
 @Service
@@ -22,21 +24,31 @@ public class CategoryPolicyServiceImpl implements CategoryPolicyService {
 
 	@Autowired
 	private CategoryPolicyRepository categoryPolicyRepository;
+	private UserRepository userRepository;
+
 	private ModelMapper mapper;
 
-	CategoryPolicyServiceImpl(CategoryPolicyRepository categoryPolicyRepository, ModelMapper mapper) {
+	CategoryPolicyServiceImpl(CategoryPolicyRepository categoryPolicyRepository, ModelMapper mapper,
+			UserRepository userRepository) {
 		this.categoryPolicyRepository = categoryPolicyRepository;
+		this.userRepository = userRepository;
 		this.mapper = mapper;
 
 	}
 
 	// Create
 	@Override
-	public CategoryPolicyDto createCategoryPolicy(CategoryPolicyDto categoryPolicyDto) {
+	public CategoryPolicyDto createCategoryPolicy(long userId, CategoryPolicyDto categoryPolicyDto) {
 		// TODO Auto-generated method stub
 		// chuyển DTO thành Entity
 		CategoryPolicy categoryPolicy = mapToEntity(categoryPolicyDto);
-		//đặt trạng thái mặc định là 1(hiện)
+
+		// Lấy user theo id
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+		// đặt user thành category entity
+		categoryPolicy.setUser(user);
+		// đặt trạng thái mặc định là 1(hiện)
 		categoryPolicy.setStatus(1);
 
 		Date currentDateTime = new Date();
@@ -51,7 +63,8 @@ public class CategoryPolicyServiceImpl implements CategoryPolicyService {
 
 	// GetAll
 	@Override
-	public CategoryPolicyResponse getAllCategoriesPolicy(int pageNo, int pageSize, String sortBy, String sortDir) {
+	public CategoryPolicyResponse getAllCategoriesPolicyByUserId(long userId, int pageNo, int pageSize, String sortBy,
+			String sortDir) {
 		// TODO Auto-generated method stub
 
 		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
@@ -59,12 +72,12 @@ public class CategoryPolicyServiceImpl implements CategoryPolicyService {
 		// tạo trường hợp có thể phân trang
 		PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
 		// tìm tất cả
-		Page<CategoryPolicy> categoriesPolicy = categoryPolicyRepository.findAll(pageable);
+		Page<CategoryPolicy> categoriesPolicy = categoryPolicyRepository.findByUserId(userId, pageable);
 		// lấy nội dung cho đối tượng trang
 		List<CategoryPolicy> listOfCategoriesPolicy = categoriesPolicy.getContent();
 
-		List<CategoryPolicyDto> content = listOfCategoriesPolicy.stream().map(categoryPolicy -> mapToDTO(categoryPolicy))
-				.collect(Collectors.toList());
+		List<CategoryPolicyDto> content = listOfCategoriesPolicy.stream()
+				.map(categoryPolicy -> mapToDTO(categoryPolicy)).collect(Collectors.toList());
 
 		CategoryPolicyResponse categoryPolicyResponse = new CategoryPolicyResponse();
 
@@ -97,7 +110,8 @@ public class CategoryPolicyServiceImpl implements CategoryPolicyService {
 		CategoryPolicy categoryPolicy = categoryPolicyRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("CategoryPolicy", "id", id));
 
-		categoryPolicy.setName(categoryPolicy.getName());
+		categoryPolicy.setName(categoryPolicyDto.getName());
+		
 		Date currentDateTime = new Date();
 		categoryPolicy.setModifiedDate(currentDateTime);
 
@@ -128,10 +142,29 @@ public class CategoryPolicyServiceImpl implements CategoryPolicyService {
 
 	// lấy list lock categoryPolicy
 	@Override
-	public List<CategoryPolicyDto> getLockCategoriesPolicy() {
-		// TODO Auto-generated method stub
-		List<CategoryPolicy> categoriesPolicy = categoryPolicyRepository.findByStatus(0);
-		return categoriesPolicy.stream().map(categoryPolicy -> mapToDTO(categoryPolicy)).collect(Collectors.toList());
+	public CategoryPolicyResponse getLockCategoriesPolicy(int pageNo, int pageSize, String sortBy, String sortDir) {
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+		// tạo trường hợp có thể phân trang
+		PageRequest pageable = PageRequest.of(pageNo, pageSize, sort);
+		// tìm tất cả
+		Page<CategoryPolicy> categoriesPolicy = categoryPolicyRepository.findByStatus(0, pageable);
+		// lấy nội dung cho đối tượng trang
+		List<CategoryPolicy> listOfCategoriesPolicy = categoriesPolicy.getContent();
+
+		List<CategoryPolicyDto> content = listOfCategoriesPolicy.stream()
+				.map(categoryPolicy -> mapToDTO(categoryPolicy)).collect(Collectors.toList());
+
+		CategoryPolicyResponse categoryPolicyResponse = new CategoryPolicyResponse();
+
+		categoryPolicyResponse.setContent(content);
+		categoryPolicyResponse.setPageNo(categoriesPolicy.getNumber());
+		categoryPolicyResponse.setPageSize(categoriesPolicy.getSize());
+		categoryPolicyResponse.setTotalElements(categoriesPolicy.getTotalElements());
+		categoryPolicyResponse.setTotalPages(categoriesPolicy.getTotalPages());
+		categoryPolicyResponse.setLast(categoriesPolicy.isLast());
+
+		return categoryPolicyResponse;
 	}
 
 	// unlock categorypolicy

@@ -1,17 +1,16 @@
 package com.evadeeva.eva.services;
 
-import java.util.List;
-
 import com.evadeeva.eva.models.dtos.BannerDto;
+import com.evadeeva.eva.models.response.BannerResponse;
 
 public interface BannerService {
 	BannerDto createBanner(long categoryId, BannerDto bannerDto);
 	
-	List<BannerDto> getBannerByCategoryId(long categoryId);
+	BannerResponse getBannerByCategoryId(long categoryId, int pageNo, int pageSize, String sortBy, String sortDir);
 
 	void lockBannerById(long bannerId);
 	
-	List<BannerDto> getLockBanners();
+	BannerResponse getLockBanners(int pageNo, int pageSize, String sortBy, String sortDir);
 	
 	void unlockBannerByStatusAndId(int status, long bannerId);
 	

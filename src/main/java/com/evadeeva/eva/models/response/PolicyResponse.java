@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PolicyResponse {
 	
-	private String name;
-	
 	private List<PolicyDto> content;
 	
 	private int pageNo;

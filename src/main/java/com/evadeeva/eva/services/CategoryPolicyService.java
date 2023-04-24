@@ -1,16 +1,14 @@
 package com.evadeeva.eva.services;
 
-import java.util.List;
-
 import com.evadeeva.eva.models.dtos.CategoryPolicyDto;
 import com.evadeeva.eva.models.response.CategoryPolicyResponse;
 
 public interface CategoryPolicyService {
-	CategoryPolicyDto createCategoryPolicy(CategoryPolicyDto categoryPolicyDto);
+	CategoryPolicyDto createCategoryPolicy(long userId, CategoryPolicyDto categoryPolicyDto);
 
-	CategoryPolicyResponse getAllCategoriesPolicy(int pageNo, int pageSize, String sortBy, String sortDir);
+	CategoryPolicyResponse getAllCategoriesPolicyByUserId(long userId, int pageNo, int pageSize, String sortBy, String sortDir);
 	
-	List<CategoryPolicyDto> getLockCategoriesPolicy();
+	CategoryPolicyResponse getLockCategoriesPolicy(int pageNo, int pageSize, String sortBy, String sortDir);
 	
 	CategoryPolicyDto getCategoryPolicyById(long id);
 	

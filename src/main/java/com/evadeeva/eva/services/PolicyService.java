@@ -1,20 +1,19 @@
 package com.evadeeva.eva.services;
 
-import java.util.List;
-
 import com.evadeeva.eva.models.dtos.PolicyDto;
+import com.evadeeva.eva.models.response.PolicyResponse;
 
 public interface PolicyService {
 	PolicyDto createPolicy(long categoryPolicyId, PolicyDto policyDto);
 	
-	List<PolicyDto> getPolicyByCategoryPolicyId(long categoryPolicyId);
+	PolicyResponse getPolicyByCategoryPolicyId(long categoryPolicyId, int pageNo, int pageSize, String sortBy, String sortDir);
 
 	void lockPolicyById(long PolicyId);
 	
 	PolicyDto updatePolicy(PolicyDto policyDto, long id);
 	
-	List<PolicyDto> getLockPolicies();
+	PolicyResponse getLockPolicies(int pageNo, int pageSize, String sortBy, String sortDir);
 	
-	void unlockPolicyByStatusAndId(int status, long PolicyId);
+	void unlockPolicyByStatusAndId(int status, long id);
 	
 }
